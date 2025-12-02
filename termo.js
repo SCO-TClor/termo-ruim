@@ -4,6 +4,7 @@
 const termoTable = document.getElementById('termoTable');
 const termoMain = document.getElementById('termoMain');
 const reloadButton = document.getElementById('reloadButton');
+const hintButton = document.getElementById('hintButton');
 const gameCard = document.getElementById('gameCard');
 const gameBoard = document.getElementById('gameBoard');
 let usedTermoDivs = Array.from(document.querySelectorAll('.termoCells'));
@@ -76,7 +77,7 @@ function handlerInput(e, inp, idx) {
 function inputLife(inputs, arrayRngWord) {
     inputs.forEach((inp, idx) => {
         inp.addEventListener('keydown', (e) => handlerKeyboard(e, inp, idx, arrayRngWord));
-        inp.addEventListener('input', e => handlerInput(e, inp, idx));
+        inp.addEventListener('input', (e) => handlerInput(e, inp, idx));
         inp.addEventListener('paste', (e) => e.preventDefault());
     });
 };
@@ -128,6 +129,7 @@ function nextTry(guess, arrayRngWord) {
         inputs = Array.from(document.querySelectorAll('.termoInput'));
         wordGuess = [];
         mainGuess = [];
+        winCond = 0;
         inputs[0].focus();
         inputLife(inputs, arrayRngWord);
     };
@@ -174,4 +176,9 @@ async function InitGame() {
 InitGame()
 reloadButton.addEventListener('click', () => {
     location.reload()
+})
+hintButton.addEventListener('click', () => {
+    gameBoard.innerHTML = 'Bem vindo ao termo do pae!';
+    gameCard.style.zIndex = '0';
+
 })
