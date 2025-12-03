@@ -12,19 +12,33 @@ let newTermoDiv = [];
 let inputs = Array.from(document.querySelectorAll('.termoInput'));
 let wordGuess = [];
 let mainGuess = [];
+let repNGuess;
+let g = 0
+let repeticoes = [];
+let rightGuess = [];
+let letter = {};
 let winCond;
+let x;
 //  // Função de cálculo da tentavia:
 function guessAnalisis(param) {
     inputs.forEach((input, idx) => {
         wordGuess[idx] = param.value || input.value;
     });
 };
+//  // Função de cálculo de repetição:          // Ver se a resposta já se repetiu
+function repeatAnalisis(wordGuess, idx) {
+    return wordGuess.some((item, i) => {
+        return i < idx && item === wordGuess[idx];
+    });
+};
 //  // Função de cálculo dos Handlers:
 function handlerKeyboard(e, inp, idx, arrayRngWord) {
     guessAnalisis(e);
     const target = e.target;
-    console.log(wordGuess);
-    if(e.ctrlKey || e.metaKey) e.preventDefault();
+    if(e.ctrlKey || e.metaKey || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault()
+        return;
+    };
     if(e.key === 'Backspace' && target.value !== '') {
         target.value = '';
     } else if(e.key === 'Backspace' && target.value === '') {
@@ -50,15 +64,73 @@ function handlerKeyboard(e, inp, idx, arrayRngWord) {
     if(e.key === 'Enter') {
         wordGuess = wordGuess.filter(x => x != '');
         if(wordGuess.length == 5){
-            wordGuess.forEach((String, idx) => {
+            for(let i = 0; i <= wordGuess.length - 1; i++) {
+                repeticoes[i] = 0;
+                rightGuess[i] = 0;
+            };
+            wordGuess.forEach((tent, idx) => {
                 if(wordGuess[idx] == arrayRngWord[idx]) {
                     mainGuess[idx] = 1;
-                } else if(arrayRngWord.includes(wordGuess[idx])) {
+                }
+            });
+            // Quantas vezes aparece verde?
+            for(let i = 0; i <= wordGuess.length - 1; i++) {
+                if(mainGuess[i] == 1 ) {
+                    rightGuess[i] += 1;
+                }
+            }
+            wordGuess.forEach((tent, idx) => {
+                if(arrayRngWord.includes(wordGuess[idx]) && 
+                wordGuess[idx] !== arrayRngWord[idx]) {
                     mainGuess[idx] = 2;
                 } else {
                     mainGuess[idx] = 0;
                 };
             });
+
+            letter = {};
+
+            wordGuess.forEach((tent, idx) => {            // Para cada letra da resposta
+                if(letter[tent] == null) {
+                    letter[tent] = {
+                        guessRep: 1,
+                        answeRep: 0
+                    };
+                } else {
+                    letter[tent].guessRep += 1;
+                }
+            });
+            arrayRngWord.forEach((tent, idx) => {            // Para cada letra da resposta
+                if(letter[tent] == null) {
+                    letter[tent] = {
+                        answeRep: 0
+                    };
+                } else {
+                    letter[tent].answeRep += 1;
+                };
+            });
+            rightGuess.forEach((tent, idx) => {
+                const key = arrayRngWord[idx];
+                if(tent === 1) {
+                    if(!letter[key]) letter[key] = { 
+                        guessRep: 0,
+                        answeRep: 0
+                    };
+                    letter[key].rightPlace = (letter[key].rightPlace ?? 0) + 1;
+                }
+            });
+            for(let i = wordGuess.length - 1; i >= 0; i--) {
+                if(rightGuess[i] == 1) {
+                    mainGuess[i] = 1;
+                } else if(mainGuess[i] == 2) {
+                    mainGuess[i] = 2;
+                } else {
+                    mainGuess[i] = 0;
+                }
+            };
+            console.log(letter);
+            console.log(rightGuess)
+            console.log('Cor final      : ', mainGuess);
             nextTry(mainGuess, arrayRngWord);
         };
     };
@@ -73,7 +145,7 @@ function handlerInput(e, inp, idx) {
             inputs[idx + 1].focus();
         };
     };
-}
+};
 function inputLife(inputs, arrayRngWord) {
     inputs.forEach((inp, idx) => {
         inp.addEventListener('keydown', (e) => handlerKeyboard(e, inp, idx, arrayRngWord));
@@ -83,7 +155,6 @@ function inputLife(inputs, arrayRngWord) {
 };
 //  // Função de cálculo da próxima tentativa:
 function nextTry(guess, arrayRngWord) {
-    console.log(guess);
     // Remove os inputs e salva:
     inputs.forEach((input, idx) => {
         const parent = inputs[idx].parentElement
@@ -117,8 +188,6 @@ function nextTry(guess, arrayRngWord) {
     //  //  // Next input:
         usedTermoDivs.splice(0, 5);
         newTermoDiv = usedTermoDivs.filter((El, idx) => idx < 5);
-        console.log(usedTermoDivs);
-        console.log(newTermoDiv);
         newTermoDiv.forEach((El) => {
             const input = document.createElement('input');
             input.classList.add('termoInput');
@@ -141,7 +210,8 @@ async function rngWord() {
     let wordArray = Array.from(palavritas.palavras);
     wordArray = wordArray.filter(StringAtual => StringAtual.length == 5);
     const wordNum = Math.floor(Math.random()*wordArray.length);
-    const randomWord = wordArray[wordNum]
+    // const randomWord = wordArray[wordNum]
+    const randomWord = 'radar';
     return randomWord;
 };
 //  // Funcionamento do jogo:
@@ -152,7 +222,6 @@ async function InitGame() {
     arrayRngWord.forEach((El, idx) => {
         arrayRngWord[idx] = El.toUpperCase();
     });
-    console.log(arrayRngWord);
     inputLife(inputs, arrayRngWord);
     // Facilitamento de jogo:
         // Foco de Clique:
@@ -177,8 +246,19 @@ InitGame()
 reloadButton.addEventListener('click', () => {
     location.reload()
 })
+const html = document.querySelector('html');
+let atualTheme = 0;
+const themes = ['FutureNocturne', 'DesertMirage', 'ShineCoal', 'AuroraBloom', 'GalaxyPurple', 'ForestNight', 'DarkBlue'];
+console.log('tema atual:',themes[atualTheme]);
 hintButton.addEventListener('click', () => {
-    gameBoard.innerHTML = 'Bem vindo ao termo do pae!';
-    gameCard.style.zIndex = '0';
-
+    // gameBoard.innerHTML = 'Bem vindo ao termo do pae!';
+    // gameCard.style.zIndex = '0';
+    console.log(themes.length);
+    if(atualTheme+1 < themes.length) {
+        atualTheme++;
+    } else {
+        atualTheme = 0;
+    };
+    html.dataset.theme = themes[atualTheme];
+    console.log('tema atual:',themes[atualTheme]);
 })
