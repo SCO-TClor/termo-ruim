@@ -13,12 +13,9 @@ let inputs = Array.from(document.querySelectorAll('.termoInput'));
 let wordGuess = [];
 let mainGuess = [];
 let repNGuess;
-let g = 0
-let repeticoes = [];
 let rightGuess = [];
 let letter = {};
 let winCond;
-let x;
 //  // Função de cálculo da tentavia:
 function guessAnalisis(param) {
     inputs.forEach((input, idx) => {
@@ -65,9 +62,9 @@ function handlerKeyboard(e, inp, idx, arrayRngWord) {
         wordGuess = wordGuess.filter(x => x != '');
         if(wordGuess.length == 5){
             for(let i = 0; i <= wordGuess.length - 1; i++) {
-                repeticoes[i] = 0;
                 rightGuess[i] = 0;
             };
+            letter = {};
             wordGuess.forEach((tent, idx) => {
                 if(wordGuess[idx] == arrayRngWord[idx]) {
                     mainGuess[idx] = 1;
@@ -87,9 +84,6 @@ function handlerKeyboard(e, inp, idx, arrayRngWord) {
                     mainGuess[idx] = 0;
                 };
             });
-
-            letter = {};
-
             wordGuess.forEach((tent, idx) => {            // Para cada letra da resposta
                 if(letter[tent] == null) {
                     letter[tent] = {
@@ -114,19 +108,32 @@ function handlerKeyboard(e, inp, idx, arrayRngWord) {
                 if(tent === 1) {
                     if(!letter[key]) letter[key] = { 
                         guessRep: 0,
-                        answeRep: 0
+                        answeRep: 0,
+                        rightPlace: 0
                     };
                     letter[key].rightPlace = (letter[key].rightPlace ?? 0) + 1;
                 }
             });
             for(let i = wordGuess.length - 1; i >= 0; i--) {
+                const key = wordGuess[i];
+
+                const guessRep = letter[key].guessRep;
+                const answeRep = letter[key].answeRep;
+                const rightPlace = letter[key].rightPlace;
                 if(rightGuess[i] == 1) {
                     mainGuess[i] = 1;
+                                                // answeRep = Quantidade da resposta
+                                                // guessRep = Quantidade da tentativa
+                                                // rightPlace = Quantos no lugar correto
                 } else if(mainGuess[i] == 2) {
-                    mainGuess[i] = 2;
-                } else {
-                    mainGuess[i] = 0;
-                }
+                    if(answeRep == rightPlace && wordGuess[i] != arrayRngWord[i]) {
+                        mainGuess[i] = 0;
+                        letter[key].guessRep -= 1;
+                    } else if(guessRep > answeRep) {
+                        mainGuess[i] = 0;
+                        letter[key].answeRep += 1;
+                    };
+                };
             };
             console.log(letter);
             console.log(rightGuess)
@@ -138,13 +145,21 @@ function handlerKeyboard(e, inp, idx, arrayRngWord) {
 function handlerInput(e, inp, idx) {
     guessAnalisis(e);
     const target = e.target;
+    const firstIdx = inputs.findIndex((input) => input.value === '');
     target.value = target.value.replace(/[^a-zA-Z\s]/g, '');
     target.value = target.value.toUpperCase();
     if(inp.value !== '' && idx < 4) {
         if(inputs[idx + 1].value == '') {
             inputs[idx + 1].focus();
+        } else if(firstIdx !== -1) {
+            inputs[firstIdx].focus();
         };
-    };
+    } else if(inp.value !== '' && idx == 4) {
+        if(firstIdx !== -1) {
+            inputs[firstIdx].focus();
+        };
+        
+    }
 };
 function inputLife(inputs, arrayRngWord) {
     inputs.forEach((inp, idx) => {
@@ -244,8 +259,8 @@ async function InitGame() {
 };
 InitGame()
 reloadButton.addEventListener('click', () => {
-    location.reload()
-})
+    location.reload();
+});
 const html = document.querySelector('html');
 let atualTheme = 0;
 const themes = ['FutureNocturne', 'DesertMirage', 'ShineCoal', 'AuroraBloom', 'GalaxyPurple', 'ForestNight', 'DarkBlue'];
@@ -261,4 +276,4 @@ hintButton.addEventListener('click', () => {
     };
     html.dataset.theme = themes[atualTheme];
     console.log('tema atual:',themes[atualTheme]);
-})
+});
