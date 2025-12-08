@@ -9,7 +9,9 @@
     transition: background-color ease 0.5s, border ease 0.5s, box-shadow ease 0.5s;
 }
 /* background: linear-gradient(145deg, #0A0A13 0%, #11121A 60%, #1A1C29 100%);*/
-
+html {
+    transition: none;
+}
 body {
     height: 100vh;
     height: 100svh;
@@ -170,10 +172,4 @@ main {
             display: flex;
         }
     }
-}
-@media (min-width: 768px) {
-    
-}
-@media (min-width: 1024px){
-
 }
