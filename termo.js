@@ -1,6 +1,7 @@
-//  // Importação de bibliotecas:
+// >============================> Importação de bibliotecas: <============================< //
 
-//  // Declaração de constantes:
+// ===========================================><=========================================== //
+// >=============================> Declaração de constantes: <============================< //
 const termoTable = document.getElementById('termoTable');
 const termoMain = document.getElementById('termoMain');
 const reloadButton = document.getElementById('reloadButton');
@@ -9,65 +10,50 @@ const gameCard = document.getElementById('gameCard');
 const gameBoard = document.getElementById('gameBoard');
 const html = document.querySelector('html');
 const themeButton = document.getElementById('themeButton');
+const checkRules = document.getElementById('rules');
 
-//  //  Declaração de variáveis:
+// --> Debug:
+const Debug = false;
+// ===========================================><=========================================== //
+// >=============================> Declaração de variáveis: <=============================< //
 let inputs = Array.from(document.querySelectorAll('.termoInput'));
 let usedTermoDivs = Array.from(document.querySelectorAll('.termoCells'));
 let newTermoDiv = [];
 let wordGuess = [];
 let mainGuess = [];
 let rightGuess = [];
-let letter = {};
 let temas = [];
+let letter = {};
 
-//  // Importação de localStorage:
+// ===========================================><=========================================== //
+// >===========================> Importação do localStorage: <============================< //
 let mainWord    = JSON.parse(localStorage.getItem('answer'))      || '';
 let trys        = JSON.parse(localStorage.getItem('try'))         || 0 ;
 let atualTheme  = JSON.parse(localStorage.getItem('theme'))       || 0 ;
 let localInputs = JSON.parse(localStorage.getItem('localInputs')) || [];
+let letColor    = JSON.parse(localStorage.getItem('keyboard'))    || {};
 
-//  // Correção do joguinho:
-if(trys >= 6) {
+// ===========================================><=========================================== //
+// >=================================> Correção inicial: <================================< //
+if(trys >= 6 || trys == 0) {
     localStorage.removeItem('answer');
     localStorage.removeItem('try');
     localStorage.removeItem('localInputs');
+    localStorage.removeItem('keyboard');
 };
 
-//  // Declaração da palavra:
-async function rngWord(mainWord, trys) {
-    //  // Caso queria escolher manualmente a palavra, escreva-a dentro
-    //  //  do fallback e adicione uma string na constante 'calibrator'
-    const calibrator = '';
-    const fallback = 'cacau';
-    if(calibrator.length === 0) {
-        if(mainWord === '' && trys === 0) {
-            const respostaFetch = await fetch('./palavras.json');
-            const palavritas = await respostaFetch.json();
-            let wordArray = Array.from(palavritas.palavras);
-            wordArray = wordArray.filter(StringAtual => StringAtual.length == 5);
-            const wordNum = Math.floor(Math.random()*wordArray.length);
-            const randomWord = wordArray[wordNum];
-            localStorage.setItem('answer', JSON.stringify(randomWord));
-            return randomWord;
-        } else {
-            return mainWord;
-        };
-    } else {
-        if(fallback.length != 5) {
-            console.log('A palavra escolhida é inválida!');
-            return;
-        } else {
-            return fallback;
-        };
-    };  
-};
-//  // localStorage use:
+// ===========================================><=========================================== //
+// >===================================> Reidratação: <===================================< //
 async function inputBuilder() {
     const chosed = await rngWord(mainWord, trys);
-    console.log('localStorage:', localStorage);
-    console.log(localInputs);
+
+    //  // Debug
+    if(Debug) {
+        console.log('localStorage:', localStorage);
+        console.log(localInputs);
+    };
+
     for(let i = 0; i < trys; i++) {
-        console.log(trys)
         inputs.forEach((input, idx) => {
             const parent = inputs[idx].parentElement;
             // Colocar o local Storage aqui
@@ -92,32 +78,73 @@ async function inputBuilder() {
         });
         inputs = Array.from(document.querySelectorAll('.termoInput'));
     };
+    Object.entries(letColor).forEach(([el, color]) => {
+        const key = el.toLowerCase();
+        const chave = key.concat('Key')
+        const keyboardKey = document.getElementById(chave);
+
+        if(color == 0) {
+            keyboardKey.classList.add('keyboardWrong');
+        } else if(color == 2) {
+            keyboardKey.classList.add('keyboardDoubt');
+        } else if(color == 1) {
+            keyboardKey.classList.remove('keyboardDoubt')
+            keyboardKey.classList.add('keyboardRight');
+        };
+    });
     inputs[0].focus();
     inputLife(inputs, Array.from(chosed).map(upper => upper.toUpperCase()));
     return chosed;
 };
-//  // Async function para os temas:
+
+// ===========================================><=========================================== //
+// >====================================> rng e tema: <===================================< //
+async function rngWord(mainWord, trys) {
+    //  // Caso queria escolher manualmente a palavra, escreva-a dentro
+    //  //  do fallback e adicione uma string na constante 'calibrator'
+    const calibrator = false;
+    const fallback = 'cacau';
+    if(!calibrator) {
+        if(mainWord === '' && trys === 0) {
+            const respostaFetch = await fetch('./palavras.json');
+            const palavritas = await respostaFetch.json();
+            let wordArray = Array.from(palavritas.palavras);
+            wordArray = wordArray.filter(StringAtual => StringAtual.length == 5);
+            const wordNum = Math.floor(Math.random()*wordArray.length);
+            const randomWord = wordArray[wordNum];
+            localStorage.setItem('answer', JSON.stringify(randomWord));
+            return randomWord;
+        } else {
+            return mainWord;
+        };
+    } else {
+        if(fallback.length != 5) {
+            console.log('A palavra escolhida é inválida!');
+            return;
+        } else {
+            return fallback;
+        };
+    };  
+};
 async function themeColor() {
     const themeCss = await fetch('./themes.css');
     const themes = await themeCss.text();
     temas = [...themes.matchAll(/:root\[data-theme='([^']+)'\]/g)].map(match => match[1])
     html.dataset.theme = temas[atualTheme];
     console.log('tema atual         :', temas[atualTheme]);
-}
+};
 themeColor();
-//  // Função de cálculo da tentavia:
-function guessAnalisis() {
+
+// ===========================================><=========================================== //
+// >=====================================> Handlers: <====================================< //
+function handlerKeyboard(e, inp, idx, arrayRngWord, inputs) {
     inputs.forEach((input, idx) => {
         wordGuess[idx] = input.value || '';
     });
-};
-//  // Função de cálculo dos Handlers:
-function handlerKeyboard(e, inp, idx, arrayRngWord, inputs) {
-    guessAnalisis();
     const target = e.target;
 
     //  // Debug:
-    console.log(e.key);
+    // console.log(e.key);
 
     //  // Tratamento inicial:
     if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Backspace' && e.key !== 'Enter') {
@@ -224,8 +251,6 @@ function handlerKeyboard(e, inp, idx, arrayRngWord, inputs) {
         let usedLetters = {};
         for(let i = 0; i < wordGuess.length; i++) {
             const key = wordGuess[i];
-
-            const guessRep = letter[key].guessRep;
             const answeRep = letter[key].answeRep;
             const rightPlace = letter[key].rightPlace;
             if(rightGuess[i] == 1) {
@@ -237,30 +262,73 @@ function handlerKeyboard(e, inp, idx, arrayRngWord, inputs) {
                 usedLetters[key] = usedLetters[key] || 0;
                 if(usedLetters[key] + rightPlace >= answeRep) {
                     mainGuess[i] = 0;
+                    letter[key].keyColor = 0;
                 } else {
                     usedLetters[key]++;
                 };
             };
         };
-
-        // console.log('Letter setted  : ', letter);
+        //  // Debug
+        if(Debug) {
+            console.log('Letter setted   : ', letter);
+            console.log('Cor final       : ', mainGuess);
+            console.log('letra escolhida : ', wordGuess);
+            console.log(localInputs);
+            console.log(letter);
+        }
         // Dados a serem salvos:
-        console.log('Cor final      : ', mainGuess);
-        console.log('Cor final      : ', wordGuess);
-        console.log(localInputs);
-        
-        localInputs[trys] = { 
+        localInputs[trys] = {
             wordGuess,
             mainGuess
         };
+
+        localInputs[trys].wordGuess.forEach((el, idx) => {
+            const letra = el;
+            
+            if(localInputs[trys].mainGuess[idx] == 1) {
+                letColor[letra] = 1;
+                if(letColor[letra]) {
+                    letColor[letra] = localInputs[trys].mainGuess[idx];
+                }    
+            } else if(localInputs[trys].mainGuess[idx] == 2) {
+                if(letColor[letra] === 1) {
+                    return;
+                } else {
+                    letColor[letra] = localInputs[trys].mainGuess[idx];
+                }
+            } else if(!arrayRngWord.includes(letra)) {
+                letColor[letra] = 0;
+            }
+            console.log(letColor[letra]);
+        });
+        Object.entries(letColor).forEach(([el, color]) => {
+            const key = el.toLowerCase();
+            const chave = key.concat('Key')
+            const keyboardKey = document.getElementById(chave);
+
+            if(color == 0) {
+                keyboardKey.classList.add('keyboardWrong');
+            } else if(color == 2) {
+                keyboardKey.classList.add('keyboardDoubt');
+            } else if(color == 1) {
+                keyboardKey.classList.remove('keyboardDoubt')
+                keyboardKey.classList.add('keyboardRight');
+            };
+        });
+        
+
         trys = localInputs.length;
-        console.log(trys);
         // Armazenamento de dados:
         localStorage.setItem('localInputs', JSON.stringify(localInputs));
         localStorage.setItem('try', JSON.stringify(trys));
-        console.log('Tentativas : ',localStorage.getItem('try'));
-        console.log('Inputs     : ',localStorage.getItem('localInputs'));
+        localStorage.setItem('keyboard', JSON.stringify(letColor));
 
+        //  // Debug
+        if(Debug) {
+            console.log(trys);
+            console.log('Tentativas : ',localStorage.getItem('try'));
+            console.log('Inputs     : ',localStorage.getItem('localInputs'));
+        };
         nextTry(mainGuess, arrayRngWord);
     };
 };
@@ -292,7 +360,9 @@ function inputLife(inputs, arrayRngWord) {
         inp.addEventListener('paste', (e) => e.preventDefault());
     });
 };
-//  // Função de cálculo da próxima tentativa:
+
+// ===========================================><=========================================== //
+// >===========================> Cálculo da próxima tentativa: <==========================< //
 function nextTry(guess, arrayRngWord) {
     // Remove os inputs e salva:
     inputs.forEach((input, idx) => {
@@ -318,21 +388,27 @@ function nextTry(guess, arrayRngWord) {
     if(winCond == 0) {
     //  //  // Vitória:
         console.log('Parabéns! Você ganhou!!!')
-        gameCard.style.zIndex = '0';
+        checkRules.checked = true;
+        checkRules.dispatchEvent(new Event('change'));
         gameBoard.innerText = 'Parabéns! Você ganhou!!!';
 
         localStorage.removeItem('answer');
         localStorage.removeItem('try');
         localStorage.removeItem('localInputs');
+        localStorage.removeItem('keyboard');
+
     } else if(usedTermoDivs.length == 5) {
     //  //  // Derrota:
         console.log('Que pena! Você Perdeu :(')
-        gameCard.style.zIndex = '0';
+        checkRules.checked = true;
+        checkRules.dispatchEvent(new Event('change'));
         gameBoard.innerText = 'Que pena! Você Perdeu :(';
 
         localStorage.removeItem('answer');
         localStorage.removeItem('try');
         localStorage.removeItem('localInputs');
+        localStorage.removeItem('keyboard');
+
     } else {
     //  //  // Next input:
         usedTermoDivs.splice(0, 5);
@@ -352,10 +428,16 @@ function nextTry(guess, arrayRngWord) {
         inputLife(inputs, arrayRngWord);
     };
 };
-//  // Funcionamento do jogo:
+
+// ===========================================><=========================================== //
+// >==============================> Funcionamento do jogo: <==============================< //
 async function InitGame() {
-    const randomNum = await inputBuilder()
+    const randomNum = await inputBuilder();
     console.log(randomNum);
+    if(randomNum === '') {
+        console.log('Erro fatal! Palavra não resolvida');
+        return;
+    };
     let arrayRngWord = Array.from(randomNum);
     arrayRngWord.forEach((El, idx) => {
         arrayRngWord[idx] = El.toUpperCase();
@@ -380,20 +462,35 @@ async function InitGame() {
     });
 };
 InitGame()
+
+// ===========================================><=========================================== //
+// >=================================> Outros Handlers: <=================================< //
 reloadButton.addEventListener('click', () => {
     localStorage.removeItem('answer');
     localStorage.removeItem('try');
     localStorage.removeItem('localInputs');
+    localStorage.removeItem('keyboard');
     location.reload();
 });
 hintButton.addEventListener('click', () => {
-    if(gameCard.style.zIndex != '0') {
-        gameBoard.innerHTML = 'Bem vindo ao termo do pae!';
-        gameCard.style.zIndex = '0';
-    } else {
-        gameCard.style.zIndex = '-1';
-    }
+    checkRules.checked = !checkRules.checked;
+    checkRules.dispatchEvent(new Event('change'));
 });
+checkRules.addEventListener('change', () => {
+    if(checkRules.checked) {
+        gameCard.style.zIndex = '1';
+        gameCard.classList.add('showing');
+        gameCard.addEventListener('transitionend', () => {
+            gameCard.style.zIndex = '1';
+        });
+    } else {
+        gameCard.classList.remove('showing');
+        gameCard.classList.add('notShowing');
+        gameCard.addEventListener('transitionend', () => {
+            gameCard.style.zIndex = '-1';
+        });
+    };
+})
 themeButton.addEventListener('click', () => {
     console.log('Quantidade de temas: ', temas.length);
     // Aqui deveria ter um + 1 no atualTheme, mas removi o último tema das opções (branco d+);
@@ -407,4 +504,4 @@ themeButton.addEventListener('click', () => {
     console.log('tema atual         :', temas[atualTheme]);
 });
 
-// Ao clicar
+// ===========================================><=========================================== //

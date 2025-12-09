@@ -6,7 +6,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: background-color ease 0.5s, border ease 0.5s, box-shadow ease 0.5s;
+    transition: border ease 0.5s, box-shadow ease 0.5s;
+    caret-color: transparent;
 }
 /* background: linear-gradient(145deg, #0A0A13 0%, #11121A 60%, #1A1C29 100%);*/
 html {
@@ -19,6 +20,7 @@ body {
     width: 100vw;
     display: flex;
     flex-direction: column;
+
 }
 
 header.header {
@@ -31,9 +33,14 @@ header.header {
     color: var(--textMain);
     box-shadow: 0 0 10px 1px var(--neon);
     z-index: 2;
+    transition: background-color ease 0.5s;
     div.headerText {
         font-family: "Gravitas One", serif;
         font-weight: 400;
+    }
+
+    #rules {
+        display: none;
     }
 
     button {
@@ -42,10 +49,13 @@ header.header {
         cursor: pointer;
         padding: 0 0.5rem;
         font-family: "Gravitas One", serif;
-        font-weight: 400;
 
         &:hover {
             box-shadow: 0 0 10px var(--neon);
+        }
+        &:active {
+            transition: none;
+            background-color: hsl(from white h s calc(l*0.5));
         }
     }
 }
@@ -59,44 +69,81 @@ main {
     grid-template-columns: auto;
     grid-template-rows: 60% 1fr;
     justify-items: center;
+    row-gap: 2rem;
+    transition: background-color ease 0.5s;
+
+    div.gameCard.notShowing {
+        transform: translateY(50px);
+        opacity: 0;
+        transition: transform ease 0.5s, opacity ease 0.5s;
+    }
+    div.gameCard.showing {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+        transition: transform ease 0.5s, opacity ease 0.5s;
+    }
 
     div.gameCard {
         z-index: -1;
         position: fixed;
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
         align-self: center;
         top: 20%;
-        background-color: rgba(47, 47, 47, 0.96);
-        box-shadow: 0 0 15px 1px black;
+        background-image: radial-gradient(circle at center, var(--fundo) 70%, var(--divisor) 100%);
+        box-shadow: 0 0 15px 1px var(--softAcc);
         width: 70%;
-        aspect-ratio: 1/1.3;
+        height: 70%;
         border-radius: 35px;
-        justify-content: center;
+        justify-content: space-around;
         align-items: center;
+        color: var(--textMain);
         
         .gameBoard {
             position: absolute;
             top: 0;
             margin: 2rem;
-            color: aliceblue;
             text-align: center;
             font-size: 2rem;
         }
         .gameShow {
-            margin: 2rem;
-            color: aliceblue;
+            margin: 2rem 2rem 0;
             text-align: center;
             font-size: 1.2rem;
             text-justify: auto;
         }
         #reloadButton {
             padding: 0.4rem;
-            position: absolute;
             border-radius: 15px;
-            margin: 2rem;
-            bottom: 0;
+            margin: 2rem 0 0;
             cursor: pointer;
+            background-color: var(--divisor);
+            color: var(--textMain);
+            font-family: "Gravitas One", serif;
+            font-size: small;
+            &:hover {
+                box-shadow: 0 0 15px 1px var(--softAcc);
+            }
+            &:active {
+                transition: none;
+                background-color: hsl(from var(--divisor) h s calc(l*0.5));
+            }
+        }
+        #themeButton {
+            padding: 0.4rem;
+            border-radius: 15px;
+            margin: 2rem 0 0;
+            cursor: pointer;
+            background-color: var(--divisor);
+            color: var(--textMain);
+            font-family: "Gravitas One", serif;
+            &:hover {
+                box-shadow: 0 0 15px 1px var(--softAcc);
+            }
+            &:active {
+                transition: none;
+                background-color: hsl(from var(--divisor) h s calc(l*0.5));
+            }
         }
     }
 
@@ -126,6 +173,10 @@ main {
             input.termoInput {
                 width: 100%;
                 height: 100%;
+                display: block;
+                text-align: center;
+                appearance: none;
+                padding: 0;
                 justify-items: center;
                 color: var(--textMain);
                 background-color: transparent;
@@ -157,19 +208,50 @@ main {
     }
 
     .termoKeyboard {
+        font-family: "Quantico", sans-serif;
+        font-size: large;
+        transition: background-color ease 0.5s;
         background-color: var(--fundo);
         color: var(--textMain);
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        gap: 0.2rem;
         
-        div.keyLineOne {
-            display: flex;
+        .keyboardRight {
+            background-color: #3aa394 !important;
+            box-shadow: none !important;
+            border: none !important;
         }
-        div.keyLineTwo {
-            display: flex;
+        
+        .keyboardWrong {
+            background-color: hsl(from var(--textDeb) h s calc(l*0.3)) !important;
+            box-shadow: none !important;
+            border: none !important;
         }
-        div.keyLineThree {
+
+        .keyboardDoubt {
+            background-color: #d3ad69 !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        & div.keyLines {
             display: flex;
+            gap: 0.2rem;
+        }
+
+        & .key {
+            text-align: center;
+            padding: 0.5rem;
+            aspect-ratio: 1/1.2;
+            border: 1px solid var(--neon);
+            background-color: var(--superf);
+            border-radius: 10px;
+            box-shadow: 0 0 5px var(--neon) inset;
         }
     }
 }

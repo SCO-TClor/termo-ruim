@@ -7,21 +7,25 @@
     <title>termo da deepWeb</title>
     <link rel="stylesheet" href="./themes.css">
     <link rel="stylesheet" href="./termo.css">
+    <script>
+        document.documentElement.dataset.theme = 'FutureNocturne';
+    </script>
 </head>
 <body>
     <header class="header">
         <div class="headerText">TERMO LIXO</div>
-        <button id="hintButton">Regras</button>
+        <input type="checkbox" id="rules">
+        <button type="button" id="hintButton">Regras</button>
     </header>
     <main id="termoMain">
-        <div id="gameCard" class="gameCard">
-            <div id="gameBoard" class="gameBoard"></div>
+        <div id="gameCard" class="gameCard notShowing">
+            <div id="gameBoard" class="gameBoard">Bem vindo ao termo do pae!</div>
             <div class="gameShow">
                 Olá, seja bem vindo ao meu termo!
                 Chamo-me <em>Pedro da Silveira Thiago</em> e tudo isso não passa de uma brincadeira minha com DOM!
             </div>
-            <button id="reloadButton">Jogar de novo</button>
             <button id="themeButton">Trocar o tema</button>
+            <button id="reloadButton">Jogar de novo</button>
         </div>
         <section class="termoTable" id="termoTable">
             <div class="termoCells"><input type="text" class="termoInput" autocomplete="off"></div>
@@ -56,37 +60,37 @@
             <div class="termoCells"></div>
         </section>
         <section class="termoKeyboard">
-            <div class="keyLineOne">
-                <div class="key">Q</div>
-                <div class="key">W</div>
-                <div class="key">E</div>
-                <div class="key">R</div>
-                <div class="key">T</div>
-                <div class="key">Y</div>
-                <div class="key">U</div>
-                <div class="key">I</div>
-                <div class="key">O</div>
-                <div class="key">P</div>
+            <div class="keyLines">
+                <div class="key" id="qKey">Q</div>
+                <div class="key" id="wKey">W</div>
+                <div class="key" id="eKey">E</div>
+                <div class="key" id="rKey">R</div>
+                <div class="key" id="tKey">T</div>
+                <div class="key" id="yKey">Y</div>
+                <div class="key" id="uKey">U</div>
+                <div class="key" id="iKey">I</div>
+                <div class="key" id="oKey">O</div>
+                <div class="key" id="pKey">P</div>
             </div>
-            <div class="keyLineTwo">
-                <div class="key">A</div>
-                <div class="key">S</div>
-                <div class="key">D</div>
-                <div class="key">F</div>
-                <div class="key">G</div>
-                <div class="key">H</div>
-                <div class="key">J</div>
-                <div class="key">K</div>
-                <div class="key">L</div>
+            <div class="keyLines">
+                <div class="key" id="aKey">A</div>
+                <div class="key" id="sKey">S</div>
+                <div class="key" id="dKey">D</div>
+                <div class="key" id="fKey">F</div>
+                <div class="key" id="gKey">G</div>
+                <div class="key" id="hKey">H</div>
+                <div class="key" id="jKey">J</div>
+                <div class="key" id="kKey">K</div>
+                <div class="key" id="lKey">L</div>
             </div>
-            <div class="keyLineThree">
-                <div class="key">Z</div>
-                <div class="key">X</div>
-                <div class="key">C</div>
-                <div class="key">V</div>
-                <div class="key">B</div>
-                <div class="key">N</div>
-                <div class="key">M</div>
+            <div class="keyLines">
+                <div class="key" id="zKey">Z</div>
+                <div class="key" id="xKey">X</div>
+                <div class="key" id="cKey">C</div>
+                <div class="key" id="vKey">V</div>
+                <div class="key" id="bKey">B</div>
+                <div class="key" id="nKey">N</div>
+                <div class="key" id="mKey">M</div>
             </div>
         </section>
     </main>
