@@ -195,14 +195,17 @@ main {
             &.termoWrong {
                 background-color: hsl(from var(--textDeb) h s calc(l*0.3));
                 /* color: hsl(120, 100%, 25%); */
+                color: aliceblue;
             }
 
             &.termoRight {
                 background-color: #3aa394;
+                color: aliceblue;
             }
             
             &.termoDoubt {
                 background-color: #d3ad69;
+                color: aliceblue;
             }
         }
     }
@@ -225,18 +228,21 @@ main {
             background-color: #3aa394 !important;
             box-shadow: none !important;
             border: none !important;
+            color: aliceblue !important;
         }
         
         .keyboardWrong {
             background-color: hsl(from var(--textDeb) h s calc(l*0.3)) !important;
             box-shadow: none !important;
             border: none !important;
+            color: aliceblue !important;
         }
 
         .keyboardDoubt {
             background-color: #d3ad69 !important;
             box-shadow: none !important;
             border: none !important;
+            color: aliceblue !important;
         }
 
         & div.keyLines {
@@ -248,7 +254,7 @@ main {
             text-align: center;
             padding: 0.5rem;
             aspect-ratio: 1/1.2;
-            border: 1px solid var(--neon);
+            border: 2px solid var(--neon);
             background-color: var(--superf);
             border-radius: 0.7rem;
             box-shadow: 0 0 5px var(--neon) inset;
